@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .calc {
+            box-shadow: 0px -1px 11px 1px rgba(0,0,0,0.5);
+            border: 1px solid grey;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            width: 200px;
+            height: 300px;
+        }
+        .calc__row{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .clear{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .calc__button,
+        .calc__sqr,
+        .calc__clear-button
+                    {
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            background-color: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            font-size: 16px;
+            border: 1px solid transparent;
+            opacity: 1;
+            transition: .2s ease;
+            
+        }
+        .calc__button:hover,
+        .calc__sqr:hover,
+        .calc__clear-button:hover,
+        .calc__result-button:hover {
+            opacity: 1;
+            box-shadow: 0px 0px 3px 2px rgba(93, 216, 119, 0.466);
+            background-color: #7ee27777;
+        }
+         .calc__result-button {
+            background-color: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            outline: none;
+            font-size: 16px;
+            width: 190px;
+            height: 30px;
+            margin: 5px;
+        }
+        .calc__input {
+            background-color: #7ee277;
+            color: #fff;
+            border: 1px solid gray unset;
+            border-radius: 5px;
+            width: 190px;
+            text-align: right;
+            margin: 0 auto;
+            font-size: 42px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="calc">
+        <input class="calc__input" type="text" id="result"/>
+        <div class="calc__row">
+            <button class="calc__button"><span>1</span></button>
+            <button class="calc__button"><span>2</span></button>
+            <button class="calc__button"><span>3</span></button>
+            <button class="calc__button"><span>4</span></button>
+            <button class="calc__button"><span>5</span></button>
+            <button class="calc__button"><span>6</span></button>
+            <button class="calc__button"><span>7</span></button>
+            <button class="calc__button"><span>8</span></button>
+            <button class="calc__button"><span>9</span></button>
+            <button class="calc__button"><span>0</span></button>
+        </div>
+
+        <div class="calc__row">
+            <button class="calc__button"><span>+</span></button>
+            <button class="calc__button"><span>-</span></button>
+            <button class="calc__button"><span>*</span></button>
+            <button class="calc__button"><span>/</span></button>
+            <button class="calc__sqr  "><span>&radic;</span></button>
+        </div>
+        
+        <div class="calc__row">
+            <button class="calc__result-button  "><span>=</span></button>
+        </div>
+
+        <div class="clear">
+            <button class="calc__clear-button  "><span>C</span></button>
+            <button class="calc__clear-button" id="clear-btn"><span>&larr;</span></button>
+        </div>
+        
+    </div>
+    
+    <script>
+    
+    var buttons = document.querySelectorAll('.calc__button');
+        const resultButton = document.querySelector('.calc__result-button');
+        const btnSqr = document.querySelector('.calc__sqr')
+        const clearButton = document.querySelector('.calc__clear-button');
+        const backSpace = document.getElementById('clear-btn');
+
+        function sum(resultText) {
+            let resText = resultText.split('');
+            console.log('Приходит в sum:', resText );
+
+            let operation = [];
+            let arr = [];
+            let longNumber = '';
+
+            for( i = 0; i < resText.length; i++) {
+                let num = resText[i];
+                console.log('for', num)
+
+                if(!['+','-','*','/'].includes(resText[i])){
+                    longNumber += resText[i];
+                }
+                else{
+                arr.push(longNumber);
+                    longNumber = '';
+                    if(['-','*','/'].includes(operation[operation.length - 1])) {
+                        const minus = operation.pop()
+                        arr.push(minus)
+                    }
+                    
+                    operation.push(resText[i]);
+                }
+
+            }
+
+            if(longNumber.length > 0){
+                arr.push(longNumber);
+
+                if(['-','*','/'].includes(operation[operation.length - 1])) {
+                        const minus = operation.pop()
+                        arr.push(minus)
+                    }
+            }
+
+        const polishArr = [...arr, ...operation];
+        const stack = [];
+            console.log('polishArr', polishArr)
+        for(let i = 0; i < polishArr.length; i++) {
+
+            if(Number(polishArr[i])) {
+                stack.push(polishArr[i])
+            }
+            else {
+                let tmp1 = stack.pop();
+                let tmp2 = stack.pop();
+                let operator = polishArr[i];
+
+                console.log('operator', operator)
+
+                switch (operator) {
+                    case "+":
+                        stack.push(Number(tmp1) + Number(tmp2));
+                        break;
+
+                    case "-":
+                        stack.push(Number(tmp2) - Number(tmp1));
+                        break;
+
+                    case "*":
+                        stack.push(Number(tmp1) * Number(tmp2));
+                        break;
+
+                    case "/":
+                        stack.push(Number(tmp2) / Number(tmp1));
+                        break;
+                }
+            }
+        }
+            
+            console.log('stack',  stack);
+            
+            return stack;
+          
+        }
+        
+        function setInputValue(button) {
+
+            const number = button.innerText;
+            const result = document.getElementById('result');
+            result.value = String(result.value) + String(number);
+            console.log('setinput:', result.value)
+            
+        }
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                setInputValue(event.target)
+            })
+        })
+
+        resultButton.addEventListener('click', (event) => {
+            const result = document.getElementById('result');
+            result.value = sum(result.value);
+            console.log('res button', result.value)
+        })
+
+        btnSqr.addEventListener('click', () => {
+            let result = document.getElementById('result')
+            result.value = Math.sqrt(result.value)
+            console.log(result.value)
+            
+        })
+
+        clearButton.addEventListener('click', () => {
+            let result = document.getElementById('result')
+            result.value = '';
+        })
+
+        backSpace.addEventListener('click', () => {
+            let result = document.getElementById('result');
+            let back = result.value.slice(0, -1);
+            result.value = back;
+        })
+    </script>
+
+
+   
+</body>
+</html>
